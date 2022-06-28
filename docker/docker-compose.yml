@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  mysql-database:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: warehouse
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    volumes:
+      - './mysql:/var/lib/mysql'
+      - './mysqldump:/mysqldump'
+      - './mysqldump:/docker-entrypoint-initdb.d'
+    networks:
+      - mysql_database_net
+networks:
+  mysql_database_net:
