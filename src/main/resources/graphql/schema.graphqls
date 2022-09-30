@@ -1,0 +1,136 @@
+enum operator {
+    _eq
+    _neq
+    _gt
+    _lt
+    _gte
+    _lte
+    _like
+}
+
+enum where {
+    _and,
+    _or
+}
+
+enum sort_direction {
+    _asc
+    _desc
+}
+
+input ColExp {
+    field: String
+    condition: operator
+    value: String
+    alias: String
+    parentAlias: operator
+    where: where
+}
+
+input SortExp {
+    field: String,
+    direction: sort_direction
+}
+
+input FiltersExp {
+    where: [ColExp],
+    sort: [SortExp],
+    page: Int,
+    limit: Int
+}
+
+interface Pageable {
+    total: Int
+    per_page: Int
+    current_page: Int
+    last_page: Int
+    next_page: Int
+    prev_page: Int
+}
+
+type Product {
+    id: ID!
+    name: String!
+    quantity: Float!
+    unitPrice: Float!
+    volume: Float!
+    deleted: Boolean
+}
+
+type OrderItem {
+    id: ID!
+    quantity: Float
+    unitPrice: Float
+    volume: Float
+    deleted: Boolean
+    order: Order
+    product: Product
+}
+
+type OrderStatus {
+    id: ID!
+    name: String
+    allowedStatusChanges: String
+    orders:[Order]
+}
+
+type Order {
+    id: ID!
+    orderNumber: String!
+    submittedDate: String
+    deliveryDate: String
+    deleted: Boolean
+    orderStatus: OrderStatus!
+    items:[OrderItem]
+}
+
+type PageableProduct implements Pageable {
+    total: Int
+    per_page: Int
+    current_page: Int
+    last_page: Int
+    next_page: Int
+    prev_page: Int
+    data: [Product]
+}
+
+type PageableOrder implements Pageable {
+    total: Int
+    per_page: Int
+    current_page: Int
+    last_page: Int
+    next_page: Int
+    prev_page: Int
+    data: [Order]
+}
+
+type PageableOrderStatus implements Pageable {
+    total: Int
+    per_page: Int
+    current_page: Int
+    last_page: Int
+    next_page: Int
+    prev_page: Int
+    data: [OrderStatus]
+}
+
+type PageableOrderItems implements Pageable {
+    total: Int
+    per_page: Int
+    current_page: Int
+    last_page: Int
+    next_page: Int
+    prev_page: Int
+    data: [OrderItem]
+}
+
+type Query {
+    products(filters: FiltersExp): PageableProduct
+    product(id: ID!): Product
+    orders(filters: FiltersExp): PageableOrder
+    order(id: ID!): Order
+    orderStatuses(filters: FiltersExp): PageableOrderStatus
+    orderStatus(id: ID!): OrderStatus
+    orderItems(filters: FiltersExp): PageableOrderItems
+    orderItem(id: ID): OrderItem
+}

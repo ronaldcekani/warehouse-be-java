@@ -4,6 +4,7 @@ import com.example.warehousemanagement.security.component.JwtTokenFilter;
 import com.example.warehousemanagement.user.persistence.UserRepo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Properties;
 
 @Configuration
 @EnableWebSecurity
@@ -84,6 +86,9 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
         http.authorizeRequests()
                 // Our public endpoints
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/products").permitAll()
+                .antMatchers("/graphql").permitAll()
+                .antMatchers("/graphiql").permitAll()
                 .anyRequest().authenticated();
 
         // Add JWT token filter
@@ -92,4 +97,23 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
                 UsernamePasswordAuthenticationFilter.class
         );
     }
+
+    @Bean
+    public JavaMailSenderImpl getJavaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("127.0.0.1");
+        mailSender.setPort(25);
+
+//        mailSender.setUsername("test@gmail.com");
+//        mailSender.setPassword("password");
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "false");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "true");
+
+        return mailSender;
+    }
+
 }

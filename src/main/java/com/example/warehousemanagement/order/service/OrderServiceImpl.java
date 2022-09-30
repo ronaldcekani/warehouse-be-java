@@ -1,5 +1,8 @@
 package com.example.warehousemanagement.order.service;
 
+import com.example.warehousemanagement.core.graphql.domain.GraphqlQueryRequest;
+import com.example.warehousemanagement.core.graphql.persistence.GraphqlGenericRepo;
+import com.example.warehousemanagement.core.http.PageableResponse;
 import com.example.warehousemanagement.order.domain.Order;
 import com.example.warehousemanagement.order.domain.OrderItem;
 import com.example.warehousemanagement.order.domain.OrderStatus;
@@ -32,6 +35,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     OrderItemRepo orderItemRepo;
+
+    @Autowired
+    GraphqlGenericRepo<Order> graphqlGenericRepo;
 
     @Override
     public OrderEntityResponseDTO create(OrderCreateDTO orderCreateDto) {
@@ -149,5 +155,15 @@ public class OrderServiceImpl implements OrderService {
             responseDTO.setSubmittedDate(order.getSubmittedDate());
             return responseDTO;
         }).toList();
+    }
+
+    @Override
+    public PageableResponse<Order, Order> get(GraphqlQueryRequest filters) {
+        return graphqlGenericRepo.filter(filters, Order.class);
+    }
+
+    @Override
+    public Order find(Long id) {
+        return graphqlGenericRepo.find(id, Order.class);
     }
 }
